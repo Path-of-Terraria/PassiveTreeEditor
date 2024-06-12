@@ -1,4 +1,4 @@
-![billede](https://github.com/Path-of-Terraria/PassiveTreeEditor/assets/65250596/77cdb6bb-3c18-402f-8c3d-d6b5573414a2)# PassiveTreeEditor
+# PassiveTreeEditor
 For path of terraria passiv skill tree (maby skill tree in the future as well?)
 
 ## How to run
