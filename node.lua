@@ -11,7 +11,7 @@ function Node:new(nodeData)
 
     node.maxLevel = nodeData.maxLevel
 
-    node.passiveId = nodeData.id
+    node.passiveId = nodeData.internalIdentifier
 
     local c = nodeData.connections or {}
 

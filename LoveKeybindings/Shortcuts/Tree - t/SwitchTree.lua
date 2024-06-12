@@ -17,6 +17,9 @@ function MyKey:onReciveText(text)
     if val == nil then
         return
     end
+
+    SelectedNode1 = nil
+    SelectedNode2 = nil
     
     SetTree(val)
 end

@@ -8,7 +8,7 @@ MyKey.key = "a"
 
 MyKey.listToPass = {}
 
-for key, _ in pairs(IconToId) do
+for key, _ in pairs(Images) do
     table.insert(MyKey.listToPass, key)
 end
 
@@ -50,13 +50,13 @@ end
 
 function MyKey:onReciveText(text)
     print(text)
-    if newNode.id == nil then
+    if newNode.internalIdentifier == nil then
         local val = self:getClosestAndClear()
         if val == nil then
             return
         end
 
-        newNode.id = IconToId[val]
+        newNode.internalIdentifier = val
         if type == 0 then
             self:startText("", "Position in the form of '# #'", false)
         elseif type == 1 then
@@ -67,9 +67,7 @@ function MyKey:onReciveText(text)
         end
     elseif newNode.position == nil then
         if type == 1 then
-            print("t1", useRotation)
             if useRotation == "" then
-                print("t11")
                 useRotation = text
                 if string.lower(useRotation) == "y" then
                     self:startText("", "Offset in the form of '(degree, right is 0) (length)'", false)
@@ -90,7 +88,8 @@ function MyKey:onReciveText(text)
                 self:startText("", "What is the max level", false)
             end
         else
-            newNode.position = split(text, " ")
+            local vals = split(text, " ")
+            newNode.position = {vals[1] or 0, vals[2] or 0}
             self.handler.startTxt(self, "", "What is the max level", false)
         end
     elseif newNode.maxLevel == nil then

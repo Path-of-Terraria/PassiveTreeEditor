@@ -5,20 +5,8 @@ Path = string.sub(Path, 0, #Path-17) .. "PathOfTerraria/"
 
 local assetPath = "../PathOfTerraria/Assets/Passives"
 
-local function split(str, sep)
-    local result = {}
-    local regex = ("([^%s]+)"):format(sep)
-    for each in str:gmatch(regex) do
-       table.insert(result, each)
-    end
-    return result
-end
-
-IconToId = {}
-
 function LoadImages()
-    IconToId = {}
-
+    Images = {}
     local pfile = io.popen('dir "'..assetPath..'" /b')
     for filename in pfile:lines() do
         local file = io.open(Path .. "Assets/Passives/" .. filename, "rb")
@@ -29,26 +17,23 @@ function LoadImages()
         local img = love.graphics.newImage( imgdata )
 
         local filenameNoPng = string.sub(filename, 1, #filename-4)
-        local nameSplit = split(filenameNoPng, "-")
+        local id = filenameNoPng
 
-        if #nameSplit == 2 then
-            local id = tonumber(nameSplit[2])
-
-            if id ~= nil then
-                Images[id] = img
-                IconToId[nameSplit[1]] = id
-            end
-        end
+        Images[id] = img
     end
     pfile:close()
 end
 LoadImages()
 
 function GetImage(id)
+
+    if Images[id] == nil then
+        error("Image: [" .. id .. "] not found.")
+    end
+
     return Images[id]
 end
 
-love.window.setMode(800, 800)
 require "LoveKeybindings.ShortcutHandler"
 local dkjson = require "LoveKeybindings.dkjson"
 
@@ -102,7 +87,6 @@ function GetNextId()
 end
 
 function SetTree(type)
-    print("ntree")
     CurTree = type
     nodes = Trees[type]
     edges = {}
@@ -113,14 +97,14 @@ function SetTree(type)
             table.insert(edges, {i, connection})
         end
     end
-    print(#edges)
 end
 
+local offset = {400, 400}
 function love.draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.print("CurTree: " .. (CurTree or ""), 10, 10)
 
-    love.graphics.translate(400, 400)
+    love.graphics.translate(offset[1], offset[2])
     for _, edge in pairs(edges) do
         local x1 = nodes[edge[1]].x
         local y1 = nodes[edge[1]].y
@@ -151,20 +135,58 @@ function love.draw()
     end
 end
 
+local holding = false
+local moved = false
+local moveTolerance = {}
 function love.mousepressed(x, y, mb)
-    x = x - 400
-    y = y - 400
-    if (mb == 1) then
-        local clicked = false
-        for _, node in pairs(nodes) do
-            if (node:mousepressed(x, y)) then
-                clicked = true
+    if mb == 1 then
+        holding = true
+        moved = false
+        moveTolerance = {}
+    elseif mb == 2 then
+        SelectedNode1 = nil
+        SelectedNode2 = nil
+    end
+end
+
+function love.mousereleased(x, y, mb)
+    x = x - offset[1]
+    y = y - offset[2]
+
+    if mb == 1 then
+        holding = false
+        
+        if moveTolerance ~= nil then
+            local clicked = false
+            for _, node in pairs(nodes) do
+                if node:mousepressed(x, y) then
+                    clicked = true
+                end
+            end
+
+            if not clicked then
+                SelectedNode1 = nil
+                SelectedNode2 = nil
             end
         end
+    end
+end
 
-        if (not clicked) then
-            SelectedNode1 = nil
-            SelectedNode2 = nil
+function love.mousemoved(x, y, xd, yd)
+    if holding then
+        if moveTolerance == nil then
+            offset = {offset[1] + xd, offset[2] + yd}
+        else
+            if #moveTolerance < 3 then
+                table.insert(moveTolerance, {xd, yd})
+            else
+                table.insert(moveTolerance, {xd, yd})
+                for _, v in pairs(moveTolerance) do
+                    offset = {offset[1] + v[1], offset[2] + v[2]}
+                end
+
+                moveTolerance = nil
+            end
         end
     end
 end
