@@ -18,7 +18,7 @@ function MyKey:onActivate()
 
         Trees[CurTree][SelectedNode1.id] = nil
         SelectedNode1 = nil
-        SetTree(CurTree)
+        GenEdges()
     end
 end
 

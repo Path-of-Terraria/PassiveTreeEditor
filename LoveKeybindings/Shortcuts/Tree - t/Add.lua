@@ -49,7 +49,6 @@ local function split(str, sep)
 end
 
 function MyKey:onReciveText(text)
-    print(text)
     if newNode.internalIdentifier == nil then
         local val = self:getClosestAndClear()
         if val == nil then
@@ -81,16 +80,31 @@ function MyKey:onReciveText(text)
                 local dist = vals[2] or 0
                 
                 newNode.position = {baseNode1.x + math.cos(r) * dist, baseNode1.y + math.sin(r) * dist}
-                self:startText("", "What is the max level", false)
+            
+                if (newNode.internalIdentifier == "JewelSocket" or newNode.internalIdentifier == "JewelSocket") then
+                    self:onReciveText("1")
+                else
+                    self.handler.startTxt(self, "", "What is the max level", false)
+                end
             else
                 local vals = split(text, " ")
                 newNode.position = {baseNode1.x + (vals[1] or 0), baseNode1.y + (vals[2] or 0)}
-                self:startText("", "What is the max level", false)
+            
+                if (newNode.internalIdentifier == "JewelSocket" or newNode.internalIdentifier == "JewelSocket") then
+                    self:onReciveText("1")
+                else
+                    self.handler.startTxt(self, "", "What is the max level", false)
+                end
             end
         else
             local vals = split(text, " ")
             newNode.position = {vals[1] or 0, vals[2] or 0}
-            self.handler.startTxt(self, "", "What is the max level", false)
+
+            if (newNode.internalIdentifier == "JewelSocket" or newNode.internalIdentifier == "JewelSocket") then
+                self:onReciveText("1")
+            else
+                self.handler.startTxt(self, "", "What is the max level", false)
+            end
         end
     elseif newNode.maxLevel == nil then
         newNode.maxLevel = tonumber(text)
@@ -100,7 +114,7 @@ function MyKey:onReciveText(text)
 
         newNode.position = {x=newNode.position[1] or 0, y=newNode.position[2] or 0}
         newNode.referenceId = GetNextId()
-        Trees[CurTree][newNode.referenceId] = Node:new(newNode)
+        Nodes[newNode.referenceId] = Node:new(newNode)
     end
 end
 

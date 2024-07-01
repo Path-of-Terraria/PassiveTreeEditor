@@ -17,7 +17,7 @@ function MyKey:onActivate()
             end
         end
         table.insert(SelectedNode1.connections, SelectedNode2.id)
-        SetTree(CurTree)
+        GenEdges()
     end
 end
 

@@ -19,7 +19,7 @@ function MyKey:onActivate()
                 i = i - 1
             end
         end
-        SetTree(CurTree)
+        GenEdges()
     end
 end
 
