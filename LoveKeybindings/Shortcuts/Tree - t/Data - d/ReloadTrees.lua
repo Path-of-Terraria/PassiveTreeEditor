@@ -7,11 +7,10 @@ MyKey.key = "t"
 function MyKey:onActivate()
     SelectedNode1 = nil
     SelectedNode2 = nil
-    
-    local treeType = CurTree
 
-    LoadTrees()
-    SetTree(treeType)
+    LoadTree()
+    GenEdges()
+    
 end
 
 return MyKey
