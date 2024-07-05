@@ -42,79 +42,63 @@ local Node = require "node"
 SelectedNode1 = nil
 SelectedNode2 = nil
 
-Trees = {}
-local nodes = {}
+-- load tree
+Nodes = {}
 local edges = {}
 
-CurTree = nil
+function LoadTree()
+    Nodes = {}
 
-function LoadTrees()
-    Trees = {}
-    nodes = {}
-    edges = {}
-    CurTree = nil
-    for _, v in pairs({"Magic", "Melee", "Ranged", "Summoner"}) do
-        local file = io.open(Path .. "Data/Passives/" .. v .. "Passives.json", "r")
-        local contents = file:read("*all")
-        local dataNodes = dkjson.decode(contents)
-        Trees[v] = {}
-        for _, nodeData in pairs(dataNodes) do
-            Trees[v][nodeData.referenceId] = Node:new(nodeData)
-        end
-        file:close()
+    local file = io.open(Path .. "Data/Passives.json", "r")
+    local contents = file:read("*all")
+    local dataNodes = dkjson.decode(contents)
+    for _, nodeData in pairs(dataNodes) do
+        Nodes[nodeData.referenceId] = Node:new(nodeData)
     end
+    file:close()
 end
-LoadTrees()
+LoadTree()
 
-function deepPrint(val, depth)
-    for i, val2 in pairs(val) do
-        if type(val2) == "table" then
-            print(depth..i.." | entering table:")
-            deepPrint(val2, depth .. "    ")
-        else
-            print(depth..i.." | "..val2)
-        end
-    end
-end
-
---deepPrint(trees, "")
-
-local largestId = 0
-
-function GetNextId()
-    largestId = largestId + 1
-    return largestId
-end
-
-function SetTree(type)
-    CurTree = type
-    nodes = Trees[type]
+function GenEdges()
     edges = {}
-
-    for i, node in pairs(nodes) do
-        largestId = math.max(i, largestId)
+    for i, node in pairs(Nodes) do
         for _, connection in pairs(node.connections) do
             table.insert(edges, {i, connection})
         end
     end
 end
+GenEdges()
+
+function GetNextId()
+    local largestId = 0;
+    for i, node in pairs(Nodes) do
+        largestId = math.max(i, largestId)
+        for _, connection in pairs(node.connections) do
+            table.insert(edges, {i, connection})
+        end
+    end
+
+    for i = 0, largestId do
+        if Nodes[i] == nil then
+            return i
+        end
+    end
+
+    return largestId + 1
+end
 
 local offset = {400, 400}
 function love.draw()
     love.graphics.setColor(1, 1, 1)
-    love.graphics.print("CurTree: " .. (CurTree or ""), 10, 10)
 
     love.graphics.translate(offset[1], offset[2])
     for _, edge in pairs(edges) do
-        local x1 = nodes[edge[1]].x
-        local y1 = nodes[edge[1]].y
-        local x2 = nodes[edge[2]].x
-        local y2 = nodes[edge[2]].y
+        local x1 = Nodes[edge[1]].x
+        local y1 = Nodes[edge[1]].y
+        local x2 = Nodes[edge[2]].x
+        local y2 = Nodes[edge[2]].y
 
-        local r = math.atan2(y2-y1, x2-x1) + math.pi/2
-
-        love.graphics.line(x1 + math.cos(r) * 10, y1 + math.sin(r) * 10, x2, y2)
-        love.graphics.line(x1 - math.cos(r) * 10, y1 - math.sin(r) * 10, x2, y2)
+        love.graphics.line(x1, y1, x2, y2)
     end
 
     if (SelectedNode1 ~= nil) then
@@ -130,7 +114,7 @@ function love.draw()
         love.graphics.print("2", SelectedNode2.x + r2, SelectedNode2.y - r2)
     end
     
-    for _, node in pairs(nodes) do
+    for _, node in pairs(Nodes) do
         node:draw()
     end
 end
@@ -158,7 +142,7 @@ function love.mousereleased(x, y, mb)
         
         if moveTolerance ~= nil then
             local clicked = false
-            for _, node in pairs(nodes) do
+            for _, node in pairs(Nodes) do
                 if node:mousepressed(x, y) then
                     clicked = true
                 end

@@ -4,12 +4,12 @@ local MyKey = s:new()
 
 MyKey.key = "s"
 
-local function GenJson(tree)
+local function GenJson(nodes)
     local data = "[\n"
-    for _, node in pairs(tree) do
+    for _, node in pairs(nodes) do
         local nodeData = "\t{\n"
 
-        nodeData = nodeData .. '\t\t"id": ' .. node.passiveId .. ',\n'
+        nodeData = nodeData .. '\t\t"internalIdentifier": "' .. node.passiveId .. '",\n'
         nodeData = nodeData .. '\t\t"referenceId": ' .. node.id .. ',\n'
         nodeData = nodeData .. '\t\t"maxLevel": ' .. node.maxLevel .. ',\n'
 
@@ -46,13 +46,11 @@ local function GenJson(tree)
 end
 
 function MyKey:onActivate()
-    if CurTree == nil then
-        return
-    end
+    local data = GenJson(Nodes)
 
-    local data = GenJson(Trees[CurTree])
+    os.rename(Path .. "Data/Passives.json", Path .. "Data/Passives.json.bak")
 
-    local file = io.open(Path .. "Data/Passives/" .. CurTree .. "Passives.json", "w")
+    local file = io.open(Path .. "Data/Passives.json", "w")
     file:write(data)
     file:close()
 end
