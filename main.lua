@@ -49,7 +49,7 @@ local edges = {}
 function LoadTree()
     Nodes = {}
 
-    local file = io.open(Path .. "Data/Passives.json", "r")
+    local file = io.open(Path .. "Common/Data/Passives.json", "r")
     local contents = file:read("*all")
     local dataNodes = dkjson.decode(contents)
     for _, nodeData in pairs(dataNodes) do
@@ -109,11 +109,11 @@ function love.draw()
 
         local r1 = math.max(SelectedNode1.width, SelectedNode1.height) / 2 * 1.1
         love.graphics.print("1", SelectedNode1.x + r1, SelectedNode1.y - r1)
-        
+
         local r2 = math.max(SelectedNode2.width, SelectedNode2.height) / 2 * 1.1
         love.graphics.print("2", SelectedNode2.x + r2, SelectedNode2.y - r2)
     end
-    
+
     for _, node in pairs(Nodes) do
         node:draw()
     end
@@ -139,7 +139,7 @@ function love.mousereleased(x, y, mb)
 
     if mb == 1 then
         holding = false
-        
+
         if moveTolerance ~= nil then
             local clicked = false
             for _, node in pairs(Nodes) do
